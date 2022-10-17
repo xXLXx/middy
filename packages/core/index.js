@@ -75,7 +75,11 @@ const runMiddlewares = (middlewares, request, done) => {
       const nextMiddleware = stack.shift()
 
       if (nextMiddleware) {
-        const retVal = nextMiddleware(request, runNext)
+        /**
+         * Updated by xXLXx due to an issue where runNext is not waiting if a promise
+         * is being used as a callback for a middleware
+         */
+        const retVal = nextMiddleware(request, () => {})
 
         if (retVal) {
           if (!isPromise(retVal)) {
@@ -85,6 +89,8 @@ const runMiddlewares = (middlewares, request, done) => {
           retVal
             .then(runNext)
             .catch(done)
+        } else {
+          runNext();
         }
 
         return
@@ -111,7 +117,11 @@ const runErrorMiddlewares = (middlewares, request, done) => {
       const nextMiddleware = stack.shift()
 
       if (nextMiddleware) {
-        const retVal = nextMiddleware(request, runNext)
+        /**
+         * Updated by xXLXx due to an issue where runNext is not waiting if a promise
+         * is being used as a callback for a middleware
+         */
+        const retVal = nextMiddleware(request, () => {})
 
         if (retVal) {
           if (!isPromise(retVal)) {
@@ -124,6 +134,8 @@ const runErrorMiddlewares = (middlewares, request, done) => {
           retVal
             .then(runNext)
             .catch(done)
+        } else {
+          runNext();
         }
 
         return
